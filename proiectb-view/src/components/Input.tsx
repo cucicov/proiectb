@@ -83,12 +83,14 @@ function Input() {
                             let item = sessionStorage.getItem('sessionCoords');
                             let coords: Coordinates | null = item ? JSON.parse(item) : null;
 
+                            const byteArray = Array.from(new TextEncoder().encode(textValue));
+
                             uploadInput({
                                 type: InputContentType.TEXT,
                                 publicToken: id!,
                                 latitude: coords?.lat,
                                 longitude: coords?.lon,
-                                data: "string" //TODO: set byteStream?
+                                data: byteArray
                             });
                         }}>
                         Submit

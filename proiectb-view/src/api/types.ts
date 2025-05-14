@@ -15,5 +15,5 @@ export type Input = {
     publicToken: string;
     latitude: number | undefined;
     longitude: number | undefined;
-    data: string;
+    data: number[];
 }

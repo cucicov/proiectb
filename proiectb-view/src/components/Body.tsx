@@ -18,7 +18,7 @@ function Body() {
     const [videoSrc, setVideoSrc] = useState<string | null>(null);
     const [pdfSrc, setPdfSrc] = useState<string | null>(null);
     const [videoFormat, setVideoFormat] = useState<string>("video/mp4");
-    const [contentType, setContentType] = useState<ContentType>(ContentType.Unknown);
+    const [contentType, setContentType] = useState<ContentType>();
 
     const {data: contentMetadata, error, isError} = useQuery({
         queryKey: ["latest-content-metadata"],
@@ -30,7 +30,7 @@ function Body() {
 
     });
 
-    useEffect(() => {
+    useEffect(() => { // TODO: check if this updateTokenLocation() call is required since it is done in Location component.
         if (isLocationPopUpRequestedFromSessionStorage()) {
             const sessionCoords = sessionStorage.getItem('sessionCoords');
             if (sessionCoords) {

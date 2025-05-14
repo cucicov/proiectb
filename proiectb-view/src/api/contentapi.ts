@@ -34,8 +34,14 @@ export const getContentByToken =
     }
 
 export const uploadInput =
-    async (input: Input) => {
+    async (input: Input): Promise<string> => {
         if (!input) {
-            throw new Error('Token is required');
+            throw new Error('Upload input is required');
         }
+
+        console.log("****: ", input);
+
+        const response =
+            await axios.post(`${import.meta.env.VITE_PROIECTB_URL}/input`, input);
+        return response.data;
     }
