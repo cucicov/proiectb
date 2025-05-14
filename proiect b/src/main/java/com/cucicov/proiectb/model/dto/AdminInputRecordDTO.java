@@ -15,7 +15,6 @@ public class AdminInputRecordDTO {
     @JsonIgnore
     private long longitude;
 
-    @JsonIgnore
     private byte[] data;
 
     public String getType() {

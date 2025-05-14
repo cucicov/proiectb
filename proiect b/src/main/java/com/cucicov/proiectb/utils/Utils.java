@@ -1,16 +1,24 @@
 package com.cucicov.proiectb.utils;
 
+import com.cucicov.proiectb.model.dto.AdminInputRecordDTO;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Instant;
 import java.util.Base64;
 import java.util.UUID;
 
 public class Utils {
 
     private static final String HMAC_ALGO = "HmacSHA256";
+    private static AppConfigurationProperties appConfigurationProperties;
+
+    public static void setAppConfigurationProperties(AppConfigurationProperties appConfigurationProperties) {
+        Utils.appConfigurationProperties = appConfigurationProperties;
+    }
 
     public static byte[] convertVideoToBytes(String filePath) throws IOException {
         File videoFile = new File(filePath);
@@ -63,6 +71,18 @@ public class Utils {
             return false; // Return false if any error occurs
         }
 
+    }
+
+    public static void initializeExpirationTime(AdminInputRecordDTO adminInput) {
+        int timeoutMinutes = appConfigurationProperties.getTimeoutMinutes();
+
+        if (adminInput.getActivationTimestamp() == null) {
+            adminInput.setActivationTimestamp(Instant.now());
+        }
+
+        Instant expirationTime = adminInput.getActivationTimestamp().plusSeconds(timeoutMinutes * 60L);
+        System.out.println(adminInput.getActivationTimestamp() + " -> " + expirationTime + " (" + timeoutMinutes + " minutes)");
+        adminInput.setExpirationTimestamp(expirationTime);
     }
 
 }

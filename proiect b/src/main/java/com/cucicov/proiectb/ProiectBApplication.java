@@ -6,6 +6,7 @@ import com.cucicov.proiectb.model.ClientInputRecord;
 import com.cucicov.proiectb.repository.AdminInputRecordRepository;
 import com.cucicov.proiectb.repository.ClientInputRecordRepository;
 import com.cucicov.proiectb.services.VideoConversionService;
+import com.cucicov.proiectb.utils.AppConfigurationProperties;
 import com.cucicov.proiectb.utils.ContentType;
 import com.cucicov.proiectb.utils.Utils;
 import jakarta.servlet.*;
@@ -17,6 +18,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -34,6 +37,7 @@ import java.util.List;
 import java.util.UUID;
 
 @SpringBootApplication
+@EnableConfigurationProperties(AppConfigurationProperties.class)
 public class ProiectBApplication implements CommandLineRunner, Filter {
 
     private final AdminInputRecordRepository adminRepository;
