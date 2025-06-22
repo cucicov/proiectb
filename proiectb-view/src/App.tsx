@@ -4,6 +4,7 @@ import Header from "./components/Header.tsx";
 import Body from "./components/Body.tsx";
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Input from "./components/Input.tsx";
+import NotFound from "./components/NotFound.tsx";
 // import Location from "./components/Location.tsx";
 
 
@@ -80,6 +81,14 @@ function App() {
                                     <Input/>
                                 </>
                             }></Route>
+                            {/* Catch-all route for 404 pages */}
+                            <Route path="*" element={
+                                <>
+                                    <Header locationEnabled={false} infoEnabled={false}/>
+                                    <NotFound/>
+                                </>
+                            }></Route>
+
                         </Routes>
                     </BrowserRouter>
                 </QueryClientProvider>

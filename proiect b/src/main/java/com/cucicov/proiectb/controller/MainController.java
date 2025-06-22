@@ -15,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -83,7 +82,7 @@ public class MainController {
         inputDTO.setActivationTimestamp(Instant.now());
         Utils.initializeExpirationTime(inputDTO);
         // TODO: check why lat/long is not set in VIEW.
-        System.out.println("INPUT:" + inputDTO.toString());
+        System.out.println("INPUT:" + inputDTO);
         return ResponseEntity.ok(inputDTO.getPublicToken());
     }
 
