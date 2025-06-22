@@ -23,7 +23,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/qrsource")
-@CrossOrigin(origins = "https://192.168.1.221:5173")
+@CrossOrigin(origins = "https://192.168.1.221:5173") //TODO: change to deployment server?
 public class MainController {
 
     private final MainService service;
