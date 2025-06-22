@@ -162,7 +162,7 @@ public class ProiectBApplication implements CommandLineRunner, Filter {
     public CorsConfigurationSource configurationSource() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("https://192.168.1.221:5173"));
+        config.setAllowedOrigins(List.of("https://192.168.1.221:5173")); //TODO: check. take dynamically?
 //        config.setAllowedOrigins(Arrays.asList ("http://localhost:5173/"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Content-Type", "Authorization", "X-Requested-With", "*"));
