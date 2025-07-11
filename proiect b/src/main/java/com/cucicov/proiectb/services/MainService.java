@@ -85,4 +85,10 @@ public class MainService {
         }
     }
 
+    public AdminInputRecordDTO saveAdminInputRecord(AdminInputRecordDTO inputDTO) {
+        AdminInputRecord adminInputRecord = this.modelMapper.map(inputDTO, AdminInputRecord.class);
+        adminInputRecord = this.adminRepository.save(adminInputRecord);
+        return this.modelMapper.map(adminInputRecord, AdminInputRecordDTO.class);
+    }
+
 }

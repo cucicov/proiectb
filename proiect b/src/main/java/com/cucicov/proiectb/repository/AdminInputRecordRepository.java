@@ -13,6 +13,6 @@ public interface AdminInputRecordRepository extends JpaRepository<AdminInputReco
     @Query(value = "SELECT new AdminInputRecord(i.publicToken, i.activationTimestamp, i.type) from AdminInputRecord i ORDER BY i.activationTimestamp DESC")
     Page<AdminInputRecord> findLatestRecordMetadata(Pageable pageable);
 
-    @Query(value = "SELECT i FROM AdminInputRecord i WHERE i.publicToken = :publicToken")
+    @Query(value = "SELECT i FROM AdminInputRecord i WHERE i.publicToken = :publicToken ORDER BY i.activationTimestamp DESC LIMIT 1")
     AdminInputRecord getDataByPublicToken(String publicToken);
 }
