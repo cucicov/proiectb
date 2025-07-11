@@ -14,6 +14,7 @@ function Input() {
 
     const [contentTypeSelected, setContentTypeSelected] = useState(options[0]);
     const [textValue, setTextValue] = useState('');
+    const [urlValue, setUrlValue] = useState('');
 
 
     return (
@@ -96,10 +97,39 @@ function Input() {
                         Submit
                     </Button>
                 </>}
+                {contentTypeSelected == options[2] && <>
+                    <TextField
+                        fullWidth
+                        label="Enter URL here"
+                        variant="outlined"
+                        value={urlValue}
+                        onChange={(e) => setUrlValue(e.target.value)}
+                        sx={{mb: 2, mt: 2}}
+                    />
+                    <Button
+                        key='submit-link'
+                        variant='contained'
+                        color='primary'
+                        onClick={() => {
+                            let item = sessionStorage.getItem('sessionCoords');
+                            let coords: Coordinates | null = item ? JSON.parse(item) : null;
+
+                            const byteArray = Array.from(new TextEncoder().encode(urlValue));
+
+                            uploadInput({
+                                type: InputContentType.LINK,
+                                publicToken: id!,
+                                latitude: coords?.lat,
+                                longitude: coords?.lon,
+                                data: byteArray
+                            });
+                        }}>
+                        Submit
+                    </Button>
+                </>}
             </Box>
 
         </Box>
-
 
     )
 }

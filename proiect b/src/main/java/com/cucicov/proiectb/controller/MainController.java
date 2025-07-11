@@ -6,7 +6,6 @@ import com.cucicov.proiectb.model.dto.AdminInputRecordDTO;
 import com.cucicov.proiectb.model.dto.ClientInputLogDTO;
 import com.cucicov.proiectb.services.MainService;
 import com.cucicov.proiectb.services.VideoConversionService;
-import com.cucicov.proiectb.utils.ContentType;
 import com.cucicov.proiectb.utils.Utils;
 import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -83,7 +82,7 @@ public class MainController {
         inputDTO.setActivationTimestamp(Instant.now());
         Utils.initializeExpirationTime(inputDTO);
         // Set content type to text/plain
-        inputDTO.setType(ContentType.TEXT.getValue());
+//        inputDTO.setType(ContentType.TEXT.getValue()); // TODO: delete?
         // TODO: check why lat/long is not set in VIEW.
         System.out.println("INPUT:" + inputDTO);
         // Save the record to the database
