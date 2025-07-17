@@ -7,6 +7,7 @@ import {createFFmpeg, fetchFile} from "@ffmpeg/ffmpeg";
 import {useParams} from "react-router-dom";
 import PDFViewer from "./PDFVIewer.tsx";
 import {Coordinates} from "../api/types.ts";
+import RedirectConfirmationDialog from "./RedirectConfirmationDialog.tsx";
 
 
 function Body() {
@@ -19,6 +20,8 @@ function Body() {
     const [pdfSrc, setPdfSrc] = useState<string | null>(null);
     const [videoFormat, setVideoFormat] = useState<string>("video/mp4");
     const [contentType, setContentType] = useState<ContentType>();
+    const [showRedirectDialog, setShowRedirectDialog] = useState<boolean>(false);
+    const [showLinkAsText, setShowLinkAsText] = useState<boolean>(false);
 
     const {data: contentMetadata, error, isError} = useQuery({
         queryKey: ["latest-content-metadata"],
@@ -121,6 +124,25 @@ function Body() {
         }, [isSuccess, contentPayload]
     );
 
+    // Show redirect confirmation dialog when content type is a link
+    useEffect(() => {
+        if (contentType === ContentType.Link && linkSrc && !showLinkAsText) {
+            setShowRedirectDialog(true);
+        }
+    }, [contentType, linkSrc, showLinkAsText]);
+
+    // Handle redirect acceptance
+    const handleRedirectAccept = () => {
+        setShowRedirectDialog(false);
+        window.location.href = linkSrc || "";
+    };
+
+    // Handle redirect rejection
+    const handleRedirectReject = () => {
+        setShowRedirectDialog(false);
+        setShowLinkAsText(true);
+    };
+
     // let contentType = queryClient.getQueryData<ContentType>(["content-type"]);
 
     // CHECK IF ERROR RECEIVED AS RESPONSE. most probably token is invalid.
@@ -153,11 +175,26 @@ function Body() {
             )}
         </Box>);
     } else if (contentType == ContentType.Link) {
-        return (<Box>
-            <a href={linkSrc ? linkSrc : "#"} target="_blank" rel="noreferrer">
-                {linkSrc}
-            </a>
-        </Box>)
+        return (
+            <>
+                <RedirectConfirmationDialog
+                    url={linkSrc || ""}
+                    open={showRedirectDialog}
+                    onAccept={handleRedirectAccept}
+                    onReject={handleRedirectReject}
+                    onClose={handleRedirectReject}
+                />
+                {showLinkAsText ? (
+                    <Box>
+                        <a href={linkSrc || ""} target="_blank" rel="noopener noreferrer">
+                            {linkSrc}
+                        </a>
+                    </Box>
+                ) : (
+                    <Box>Waiting for your confirmation...</Box>
+                )}
+            </>
+        )
 
     } else if (contentType == ContentType.Video) {
         return (

@@ -9,6 +9,7 @@ import com.cucicov.proiectb.model.dto.ClientInputLogDTO;
 import com.cucicov.proiectb.repository.AdminInputRecordRepository;
 import com.cucicov.proiectb.repository.ClientInputLogRepository;
 import com.cucicov.proiectb.repository.ClientInputRecordRepository;
+import com.cucicov.proiectb.utils.ContentType;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Async;
@@ -18,6 +19,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.net.URI;
 
 @Service
 public class MainService {
@@ -86,6 +88,32 @@ public class MainService {
     }
 
     public AdminInputRecordDTO saveAdminInputRecord(AdminInputRecordDTO inputDTO) {
+
+        // perform additional operations on input before save
+        switch (ContentType.valueOfString(inputDTO.getType())) {
+
+            // formatting in the case of links to be sure that they are prefixed with 'http://'
+            case LINK -> { //TODO: use Google safe browsing API to check the urls.
+                if (inputDTO.getData() != null) {
+                    String url = new String(inputDTO.getData()).trim();
+                    
+                    // Check if URL already has a scheme
+                    if (!url.matches("^[a-zA-Z][a-zA-Z0-9+.-]*://.*")) {
+                        url = "http://" + url;
+                    }
+                    
+                    // Validate the final URL
+                    try {
+                        new URI(url).toURL(); // This validates the URL format
+                        inputDTO.setData(url.getBytes());
+                    } catch (Exception e) {
+                        throw new IllegalArgumentException("Invalid URL format: " + url, e);
+                    }
+                }
+            }
+
+        }
+
         AdminInputRecord adminInputRecord = this.modelMapper.map(inputDTO, AdminInputRecord.class);
         adminInputRecord = this.adminRepository.save(adminInputRecord);
         return this.modelMapper.map(adminInputRecord, AdminInputRecordDTO.class);

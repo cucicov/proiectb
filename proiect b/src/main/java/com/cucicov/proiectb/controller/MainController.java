@@ -79,12 +79,10 @@ public class MainController {
 
     @PostMapping("/input")
     public ResponseEntity<String> getInput(@RequestBody AdminInputRecordDTO inputDTO) {
-        inputDTO.setActivationTimestamp(Instant.now());
-        Utils.initializeExpirationTime(inputDTO);
+        Utils.initializeTimestamps(inputDTO);
         // Set content type to text/plain
-//        inputDTO.setType(ContentType.TEXT.getValue()); // TODO: delete?
         // TODO: check why lat/long is not set in VIEW.
-        System.out.println("INPUT:" + inputDTO);
+        System.out.println("INPUT:" + inputDTO); // TODO: delete?
         // Save the record to the database
         this.service.saveAdminInputRecord(inputDTO);
         return ResponseEntity.ok(inputDTO.getPublicToken());

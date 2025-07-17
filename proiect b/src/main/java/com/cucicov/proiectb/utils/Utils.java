@@ -73,7 +73,15 @@ public class Utils {
 
     }
 
-    public static void initializeExpirationTime(AdminInputRecordDTO adminInput) {
+
+    /**
+     * Initializes or updates the activation and expiration timestamps for an admin input record.
+     * Activation timestamp will be initialized to the current time.
+     * The expiration timestamp is calculated by adding configured timeout minutes to the activation time.
+     *
+     * @param adminInput The AdminInputRecordDTO object to initialize timestamps for
+     */
+    public static void initializeTimestamps(AdminInputRecordDTO adminInput) {
         int timeoutMinutes = appConfigurationProperties.getTimeoutMinutes();
 
         if (adminInput.getActivationTimestamp() == null) {
@@ -81,8 +89,9 @@ public class Utils {
         }
 
         Instant expirationTime = adminInput.getActivationTimestamp().plusSeconds(timeoutMinutes * 60L);
-        System.out.println(adminInput.getActivationTimestamp() + " -> " + expirationTime + " (" + timeoutMinutes + " minutes)");
+//        System.out.println(adminInput.getActivationTimestamp() + " -> " + expirationTime + " (" + timeoutMinutes + " minutes)"); //TODO: delete?
         adminInput.setExpirationTimestamp(expirationTime);
+        adminInput.setActivationTimestamp(Instant.now());
     }
 
 }
