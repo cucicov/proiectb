@@ -57,7 +57,7 @@ function Header({locationEnabled = false, infoEnabled = false}) {
         if (error instanceof Error) {
             const statusCode = (error as any).response?.status;
             const message = (error as any).response?.message;
-            console.log('Response status:', statusCode);
+            console.log('Response status:', statusCode); //TODO: include component data in printed error.
             console.log('Response message:', message);
             return (
                 <></>

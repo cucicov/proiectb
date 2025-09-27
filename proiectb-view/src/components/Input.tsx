@@ -3,10 +3,10 @@ import {Box, Button, Stack, TextField} from "@mui/material";
 import {useState, useEffect} from "react";
 import Location from "./Location.tsx";
 import {useParams} from "react-router-dom";
-import {uploadInput} from "../api/contentapi.ts";
+import {getLatestContentMetadata, uploadInput} from "../api/contentapi.ts";
 import {Coordinates} from "../api/types.ts";
 import {InputContentType} from "../utils/utils.ts";
-
+import {useQuery} from "@tanstack/react-query";
 
 function Input() {
     const {id} = useParams();
@@ -17,6 +17,11 @@ function Input() {
     const [urlValue, setUrlValue] = useState('');
     const [isUrlValid, setIsUrlValid] = useState(false);
     const [urlError, setUrlError] = useState('');
+
+    const {error, isError} = useQuery({
+        queryKey: ["latest-content-metadata"],
+        queryFn: () => getLatestContentMetadata(id),
+    });
 
     // Validate URL format
     const validateUrl = (url: string) => { //TODO: maybe move this to external file?
@@ -47,128 +52,139 @@ function Input() {
     }, [urlValue, contentTypeSelected]);
 
 
-    return (
-        <Box sx={{
-            mt: 1,
-            display: 'flex',
-            gap: 2,
-            flexDirection: {
-                xs: 'column',
-                md: 'row'
-            },
-            justifyContent: 'center',
-            alignItems: {
-                xs: 'center',    // Centers content when in column direction
-                md: 'stretch'    // Default behavior for row direction
-            }
+    if (isError) {
+        if (error instanceof Error) {
+            return (
+                <Box sx={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh'}}>
+                    Invalid token. //TODO: get error from response.
+                </Box>
+            )
+        }
+    } else {
 
-        }}>
-
+        return (
             <Box sx={{
-                order: {
-                    xs: 1,  // second on mobile
-                    md: 2   // first on desktop
-                }
-            }}>
-                <Location/>
-            </Box>
-
-            <Box sx={{
-                flexGrow: 1,
-                order: {
-                    xs: 2,  // second on mobile
-                    md: 1   // first on desktop
+                mt: 1,
+                display: 'flex',
+                gap: 2,
+                flexDirection: {
+                    xs: 'column',
+                    md: 'row'
                 },
+                justifyContent: 'center',
+                alignItems: {
+                    xs: 'center',    // Centers content when in column direction
+                    md: 'stretch'    // Default behavior for row direction
+                }
+
             }}>
-                <h3>Choose one type of the content to upload</h3>
-                <Stack direction="row" spacing={1}>
-                    {options.map((option) => (
+
+                <Box sx={{
+                    order: {
+                        xs: 1,  // second on mobile
+                        md: 2   // first on desktop
+                    }
+                }}>
+                    <Location/>
+                </Box>
+
+                <Box sx={{
+                    flexGrow: 1,
+                    order: {
+                        xs: 2,  // second on mobile
+                        md: 1   // first on desktop
+                    },
+                }}>
+                    <h3>Choose one type of the content to upload</h3>
+                    <Stack direction="row" spacing={1}>
+                        {options.map((option) => (
+                            <Button
+                                key={option}
+                                variant={contentTypeSelected === option ? "contained" : "outlined"}
+                                onClick={() => {
+                                    setContentTypeSelected(option)
+                                }}
+                                color="secondary"
+                            >
+                                {option}
+                            </Button>
+                        ))}
+                    </Stack>
+
+                    {/******INPUT TEXT******/}
+                    {contentTypeSelected == options[0] && <>
+                        <TextField
+                            fullWidth
+                            label="Enter text here"
+                            variant="outlined"
+                            multiline
+                            rows={4}
+                            value={textValue}
+                            onChange={(e) => setTextValue(e.target.value)}
+                            sx={{mb: 2, mt: 2}}
+                        />
                         <Button
-                            key={option}
-                            variant={contentTypeSelected === option ? "contained" : "outlined"}
+                            key='submit-text'
+                            variant='contained'
+                            color='primary'
                             onClick={() => {
-                                setContentTypeSelected(option)
-                            }}
-                            color="secondary"
-                        >
-                            {option}
+                                let item = sessionStorage.getItem('sessionCoords');
+                                let coords: Coordinates | null = item ? JSON.parse(item) : null;
+
+                                const byteArray = Array.from(new TextEncoder().encode(textValue));
+
+                                uploadInput({
+                                    type: InputContentType.TEXT,
+                                    publicToken: id!,
+                                    latitude: coords?.lat,
+                                    longitude: coords?.lon,
+                                    data: byteArray
+                                });
+                            }}>
+                            Submit
                         </Button>
-                    ))}
-                </Stack>
+                    </>}
 
-                {/******INPUT TEXT******/}
-                {contentTypeSelected == options[0] && <>
-                    <TextField
-                        fullWidth
-                        label="Enter text here"
-                        variant="outlined"
-                        multiline
-                        rows={4}
-                        value={textValue}
-                        onChange={(e) => setTextValue(e.target.value)}
-                        sx={{mb: 2, mt: 2}}
-                    />
-                    <Button
-                        key='submit-text'
-                        variant='contained'
-                        color='primary'
-                        onClick={() => {
-                            let item = sessionStorage.getItem('sessionCoords');
-                            let coords: Coordinates | null = item ? JSON.parse(item) : null;
+                    {/******INPUT LINK******/}
+                    {contentTypeSelected == options[2] && <>
+                        <TextField
+                            fullWidth
+                            label="Enter URL here"
+                            variant="outlined"
+                            value={urlValue}
+                            onChange={(e) => setUrlValue(e.target.value)}
+                            error={!!urlError}
+                            helperText={urlError}
+                            sx={{mb: 2, mt: 2}}
+                        />
+                        <Button
+                            key='submit-link'
+                            variant='contained'
+                            color='primary'
+                            disabled={!isUrlValid}
+                            onClick={() => {
+                                let item = sessionStorage.getItem('sessionCoords');
+                                let coords: Coordinates | null = item ? JSON.parse(item) : null;
 
-                            const byteArray = Array.from(new TextEncoder().encode(textValue));
+                                const byteArray = Array.from(new TextEncoder().encode(urlValue));
 
-                            uploadInput({
-                                type: InputContentType.TEXT,
-                                publicToken: id!,
-                                latitude: coords?.lat,
-                                longitude: coords?.lon,
-                                data: byteArray
-                            });
-                        }}>
-                        Submit
-                    </Button>
-                </>}
+                                uploadInput({
+                                    type: InputContentType.LINK,
+                                    publicToken: id!,
+                                    latitude: coords?.lat,
+                                    longitude: coords?.lon,
+                                    data: byteArray
+                                });
+                            }}>
+                            Submit
+                        </Button>
+                    </>}
+                </Box>
 
-                {/******INPUT LINK******/}
-                {contentTypeSelected == options[2] && <>
-                    <TextField
-                        fullWidth
-                        label="Enter URL here"
-                        variant="outlined"
-                        value={urlValue}
-                        onChange={(e) => setUrlValue(e.target.value)}
-                        error={!!urlError}
-                        helperText={urlError}
-                        sx={{mb: 2, mt: 2}}
-                    />
-                    <Button
-                        key='submit-link'
-                        variant='contained'
-                        color='primary'
-                        disabled={!isUrlValid}
-                        onClick={() => {
-                            let item = sessionStorage.getItem('sessionCoords');
-                            let coords: Coordinates | null = item ? JSON.parse(item) : null;
-
-                            const byteArray = Array.from(new TextEncoder().encode(urlValue));
-
-                            uploadInput({
-                                type: InputContentType.LINK,
-                                publicToken: id!,
-                                latitude: coords?.lat,
-                                longitude: coords?.lon,
-                                data: byteArray
-                            });
-                        }}>
-                        Submit
-                    </Button>
-                </>}
             </Box>
 
-        </Box>
-
-    )
+        )
+    }
 }
 
 export default Input;
